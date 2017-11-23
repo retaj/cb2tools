@@ -8,8 +8,8 @@
 #'
 #' @docType package
 #' @name cb2tools
-#' @importFrom rstudioapi askForPassword
-# @importFrom data.table data.table
+#'
+#' @importFrom data.table data.table
 # @import DBI
 # @import RMySQL
 NULL
@@ -17,7 +17,8 @@ NULL
 .onLoad <- function(libname, pkgname) {
   op <- options()
   op.cb2 <- list(
-    mysql.db   = "circBase2"
+    db.username = "cb2admin",
+    mysql.db    = "circBase2"
   )
   toset <- !(names(op.cb2) %in% names(op))
   if (any(toset)) options(op.cb2[toset])

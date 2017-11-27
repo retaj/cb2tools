@@ -14,6 +14,8 @@ circs.se
 
 
 # connect to circBase2
+library(cb2tools)
+library(DBI)
 conn <- cb2connect(password="01cb2admin")
 
 # list tables
@@ -21,58 +23,13 @@ dbListTables(conn)
 dbLinesPerTable(conn)
 
 CS.annot <- list(
-  organism <- "hsa",
-  assembly <- "hg19"
+  organism = "hsa",
+  assembly = "hg19"
 )
 
-
-
-tab <- resTable(circs.se)
-tab$circBaseID <- paste0("hsa_circ_000000", 1:4)
-
-########################
-### hsa_hg19_circles ###
-########################
-
-dbListFields(conn, "hsa_hg19_circles")
-tab1 <- tab[,.(circBaseID, chr, start, end, strand)]
-setnames(tab1, c("circBaseID", "chrom", "pos_start", "pos_end", "strand"))
-
-insertStatement <- sqlAppendTable(conn, "hsa_hg19_circles", tab1)
-dbExecute(conn, insertStatement)
-
-
-######################
-### hsa_hg19_hosts ###
-######################
-dbListFields(conn, "hsa_hg19_hosts")
-res <- dbSendQuery(conn, paste0("SELECT circID, circBaseID
-                                FROM   hsa_hg19_circles
-                                WHERE circBaseID IN ",
-                                "(\"",
-                                paste(tab$circBaseID, collapse = "\", \""),
-                                "\")"))
-while(!dbHasCompleted(res)){
-  chunk <- fetch(res, n = 10000)
-}
-
-tab2 <- merge(tab, chunk, by="circBaseID")
-tab2$spliced_length <- tab2$end - tab2$start
-tab3 <- tab2[,.(circID, spliced_length, gene_id, feature, junct.known)]
-tab3$best_transcript <- tab3$gene_id
-tab3$gene_symbol <- tab3$gene_id
-tab3$feature_start <-  sapply(strsplit(tab3$feature, ":"), "[", 1)
-tab3$feature_end   <-  sapply(strsplit(tab3$feature, ":"), "[", 2)
-setnames(tab3, "junct.known", "junct_known")
-tab3 <- tab3[,.(circID, spliced_length, best_transcript, gene_id,
-                gene_symbol, feature_start, feature_end, junct_known)]
-
-rm(tab2)
-rm(tab3)
-
-insertStatement <- sqlAppendTable(conn, "hsa_hg19_hosts", tab3)
-dbExecute(conn, insertStatement)
-
+dbDump(conn, circs.se, CS.annot)
+dbLinesPerTable(conn)
+dbDisconnect(conn)
 
 
 ##################

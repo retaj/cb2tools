@@ -4,7 +4,7 @@
 \alias{dbDump}
 \title{load a ciRcus object into circBase2}
 \usage{
-dbDump(conn, CS, exp.annot)
+dbDump(conn, CS, CS.annot)
 }
 \arguments{
 \item{conn}{DBI connection}

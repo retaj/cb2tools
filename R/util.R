@@ -17,3 +17,15 @@ collapseVector <- function(charvec) {
 
   return(collapsed.charvec)
 }
+
+# ---------------------------------------------------------------------------- #
+#' fetch circBase IDs from the database
+#'
+#' for a given SummarizedExperiment, fetch circBase IDs based on chr:start-endStrand
+#' for now, generate dummy temporary IDs
+#'
+#' @export
+getcircBaseIDs <- function(DT) {
+
+  return(paste0("dum_circ_", sprintf("%07d", 1:nrow(DT))))
+}
